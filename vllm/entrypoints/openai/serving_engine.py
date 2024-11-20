@@ -39,6 +39,7 @@ from vllm.inputs import TokensPrompt
 from vllm.inputs.parse import parse_and_batch_prompt
 from vllm.logger import init_logger
 from vllm.lora.request import LoRARequest
+from vllm.lora.resolver import LoraResolver
 from vllm.pooling_params import PoolingParams
 from vllm.prompt_adapter.request import PromptAdapterRequest
 from vllm.sampling_params import BeamSearchParams, SamplingParams
@@ -207,7 +208,7 @@ class OpenAIServing:
             err_type="NotFoundError",
             status_code=HTTPStatus.NOT_FOUND)
 
-    def _maybe_get_adapters(
+    async def _maybe_get_adapters(
         self, request: AnyRequest
     ) -> Union[Tuple[None, None], Tuple[LoRARequest, None], Tuple[
             None, PromptAdapterRequest]]:
@@ -216,6 +217,12 @@ class OpenAIServing:
         for lora in self.lora_requests:
             if request.model == lora.lora_name:
                 return lora, None
+        if self.lora_resolver:
+            lora_request = await self.lora_resolver.resolve_lora(request.model)
+            existing_ids = {lora.lora_int_id for lora in self.lora_requests}
+            if lora_request.lora_int_id not in existing_ids:
+                self.lora_requests.append(lora_request)
+                return lora_request, None
         for prompt_adapter in self.prompt_adapter_requests:
             if request.model == prompt_adapter.prompt_adapter_name:
                 return None, prompt_adapter
