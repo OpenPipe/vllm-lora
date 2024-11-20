@@ -39,7 +39,7 @@ from vllm.inputs import TokensPrompt
 from vllm.inputs.parse import parse_and_batch_prompt
 from vllm.logger import init_logger
 from vllm.lora.request import LoRARequest
-from vllm.lora.resolver import LoraResolver
+from vllm.lora.resolver import LoRAResolver
 from vllm.pooling_params import PoolingParams
 from vllm.prompt_adapter.request import PromptAdapterRequest
 from vllm.sampling_params import BeamSearchParams, SamplingParams
@@ -98,7 +98,7 @@ class OpenAIServing:
         base_model_paths: List[BaseModelPath],
         *,
         lora_modules: Optional[List[LoRAModulePath]],
-        lora_resolver: Optional[LoraResolver],
+        lora_resolver: Optional[LoRAResolver],
         prompt_adapters: Optional[List[PromptAdapterPath]],
         request_logger: Optional[RequestLogger],
         return_tokens_as_token_ids: bool = False,

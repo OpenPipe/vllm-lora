@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from vllm.lora.request import LoRARequest
-class LoraResolver(ABC):
+class LoRAResolver(ABC):
 
     @abstractmethod
     async def resolve_lora(self, lora_name: str) -> LoRARequest | None:
